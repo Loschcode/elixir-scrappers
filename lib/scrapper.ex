@@ -17,28 +17,34 @@ defmodule Scrapper do
     |> to_module
   end
 
-  def to_module(string) do
+  defp to_module(string) do
     :"Elixir.Scrapper.#{string}"
   end
 
   defp process_response!(response, module_directory) do
     for data <- @datas_list do
-       response
-       |> module_directory.fetch_tags
-       |> module_directory.select_tag(data)
-       |> process_result(data)
+      try do
+         response
+         |> module_directory.fetch_tags
+         |> module_directory.select_tag(data)
+         |> module_directory.extract_from_tag
+         |> process_result(data)
+       rescue
+         message in Scrapper.Error -> IO.puts "Impossible to resolve #{data} (#{message})"
+       end
      end
   end
 
-  defp process_result(result, data) when is_tuple(result), do: success(data, result)
-  defp process_result(_, data), do: error(data)
+  defp process_result(result, data) when is_bitstring(result), do: success(data, result)
+  defp process_result(result, data) when is_tuple(result), do: error(data, result.tl)
+  defp process_result(_, data), do: error(data, "")
 
-  defp error(data) do
-    IO.puts "Impossible to resolve #{clean_name(data)}."
+  defp error(data, message) do
+    IO.puts "Impossible to resolve #{clean_name(data)} (#{message})"
   end
 
   defp success(data, result) do
-    IO.puts "#{clean_name(data)} is #{extract_from_tag(result)}"
+    IO.puts "#{clean_name(data)} is #{result}"
   end
 
   defp clean_name(atom) do
