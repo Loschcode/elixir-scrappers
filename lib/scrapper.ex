@@ -32,16 +32,14 @@ defmodule Scrapper do
   end
 
   defp process_result(result, data) when is_bitstring(result), do: success(data, result)
-  defp process_result(result, data) when is_tuple(result), do: error(data, result.tl)
-  defp process_result(_, data), do: error(data, "")
+  defp process_result({:error, error}, data), do: error(data, error)
 
   defp error(data, message) do
-    {:error, "Impossible to resolve #{clean_name(data)} (#{message})"}
+    {:error, [type: data, response: message]}
   end
 
   defp success(data, result) do
-    IO.puts "#{clean_name(data)} is #{result}"
-    {:ok, "#{clean_name(data)} is #{result}"}
+    {:ok, [type: data, response: result]}
   end
 
   defp clean_name(atom) do
