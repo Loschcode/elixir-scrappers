@@ -14,7 +14,7 @@ defmodule TRAINING.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :sync, :httpoison, :floki]]
+    [applications: [:logger, :httpoison, :floki]]
   end
 
   # Dependencies can be Hex packages:
@@ -30,7 +30,7 @@ defmodule TRAINING.Mixfile do
     [
       {:httpoison, "~> 0.9"},
       {:floki, "~> 0.3"},
-      {:sync, git: "https://github.com/rustyio/sync.git", tag: "master"}
+      #{:sync, git: "https://github.com/rustyio/sync.git", tag: "master"}
     ]
   end
 end

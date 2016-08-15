@@ -23,16 +23,12 @@ defmodule Scrapper do
 
   defp process_response!(response, module_directory) do
     for data <- @datas_list do
-      try do
-         response
-         |> module_directory.fetch_tags
-         |> module_directory.select_tag(data)
-         |> module_directory.extract_from_tag
-         |> process_result(data)
-       rescue
-         message in Scrapper.Error -> IO.puts "Impossible to resolve #{data} (#{message})"
-       end
-     end
+      response
+      |> module_directory.fetch_tags
+      |> module_directory.select_tag(data)
+      |> module_directory.extract_from_tag
+      |> process_result(data)
+    end
   end
 
   defp process_result(result, data) when is_bitstring(result), do: success(data, result)
@@ -40,11 +36,12 @@ defmodule Scrapper do
   defp process_result(_, data), do: error(data, "")
 
   defp error(data, message) do
-    IO.puts "Impossible to resolve #{clean_name(data)} (#{message})"
+    {:error, "Impossible to resolve #{clean_name(data)} (#{message})"}
   end
 
   defp success(data, result) do
     IO.puts "#{clean_name(data)} is #{result}"
+    {:ok, "#{clean_name(data)} is #{result}"}
   end
 
   defp clean_name(atom) do
